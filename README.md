@@ -1,4 +1,4 @@
-📈 Simulador Financeiro de Renda Fixa em Java
+
 <div align="center">
 
 > **Aplicação interativa em Java para simulação de juros compostos com aportes mensais, comparação com juros simples e apuração da tabela regressiva de Imposto de Renda (IR).**
