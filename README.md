@@ -1,5 +1,7 @@
+
 <div align="center">
 
+> **Aplicação interativa em Java para simulação de juros compostos com aportes mensais, comparação com juros simples e apuração da tabela regressiva de Imposto de Renda (IR).**
 # 📈 Simulador Financeiro de Renda Fixa
 
 **Simulação de juros compostos com aportes mensais, comparação com juros simples e Imposto de Renda pela tabela regressiva.**
@@ -13,6 +15,7 @@
 
 ---
 
+## 📌 Sobre o Projeto
 ## 📌 Sobre o projeto
 
 O **Simulador Financeiro** é uma aplicação de terminal em **Java** que projeta o crescimento de um investimento em **Renda Fixa** (como CDB e Tesouro Direto), mês a mês.
@@ -24,8 +27,10 @@ Você informa o valor inicial, o prazo, o aporte mensal e a taxa de juros. O pro
 <!--
 Dica: tire um print do terminal rodando, salve em docs/demo.png e tire este comentário:
 
+O **Simulador Financeiro** é uma aplicação desenvolvida em **Java** focada na resolução de um problema real do ecossistema financeiro: a projeção patrimonial e cálculo de rentabilidade em investimentos de **Renda Fixa** (como CDB, Tesouro Direto, LCI e LCA).
 ## 🖼️ Demonstração
 
+O programa calcula a curva de crescimento do dinheiro mês a mês, considerando o aporte inicial e aportes recorrentes. Ao final, gera relatórios interativos para comparar o ganho em **juros compostos** versus **juros simples**, além de descontar automaticamente o **Imposto de Renda retido na fonte** com base na tabela regressiva oficial da Receita Federal.
 ![Simulador rodando no terminal](docs/demo.png)
 -->
 
@@ -33,6 +38,12 @@ Dica: tire um print do terminal rodando, salve em docs/demo.png e tire este come
 
 ## 🎯 Funcionalidades
 
+- 🛡️ **Validação de Entradas:** Impede prazos inválidos ou zerados através de laço de repetição `while`.
+- 📅 **Projeção Mês a Mês:** Calcula e imprime no console a evolução do saldo a cada mês.
+- 💵 **Aportes Mensais:** Simula o impacto de novos aportes ao longo do tempo.
+- 📊 **Comparativo de Rendimentos:** Exibe o poder dos juros sobre juros em relação aos juros simples.
+- 🏛️ **Cálculo Tributário Automático:** Aplica a alíquota regressiva do Imposto de Renda conforme o prazo do investimento.
+- 🎨 **Console Interativo Colorido:** Interface de terminal estilizada com códigos ANSI (Verde, Vermelho, Amarelo e Ciano) e navegação via `switch/case`.
 - 🛡️ **Validação do prazo:** repete a pergunta com `while` enquanto o tempo for zero ou negativo
 - 📅 **Projeção mês a mês:** imprime a evolução do saldo a cada mês
 - 💵 **Aportes mensais:** simula o impacto de novos aportes ao longo do tempo
@@ -52,6 +63,7 @@ Dica: tire um print do terminal rodando, salve em docs/demo.png e tire este come
 
 ---
 
+## 💼 Regras de Negócio e Fórmulas Financeiras
 ## 💼 Regras de negócio e fórmulas
 
 <details>
@@ -59,8 +71,11 @@ Dica: tire um print do terminal rodando, salve em docs/demo.png e tire este come
 
 A cada mês $t$, o saldo anterior recebe o aporte e, sobre o total, incide a taxa:
 
-$$\text{Saldo}_t = (\text{Saldo}_{t-1} + \text{Aporte}) \times \left(1 + \frac{\text{taxa}}{100}\right)$$
+### 1. Evolução Patrimonial (Juros Compostos com Aporte)
+A cada mês (t), o saldo do período anterior recebe o aporte mensal e, sobre o total, incide a taxa de juros informada: $$\text{Saldo} t = (\text{Saldo} {t-1} + \text{Aporte}) \times \left(1 + \frac{\text{taxa}}{100}\right)$$
 
+### 2. Tabela Regressiva de Imposto de Renda
+O Imposto de Renda incide **exclusivamente sobre o rendimento (lucro)**:
 </details>
 
 <details>
@@ -68,6 +83,7 @@ $$\text{Saldo}_t = (\text{Saldo}_{t-1} + \text{Aporte}) \times \left(1 + \frac{\
 
 O IR incide **somente sobre o rendimento (lucro)**. O programa considera 1 mês = 30 dias.
 
+| Prazo da Aplicação | Dias Corridos | Alíquota de IR |
 | Prazo da aplicação | Dias corridos | Alíquota de IR |
 | :--- | :--- | :--- |
 | Até 6 meses | Até 180 dias | **22,5%** |
@@ -76,7 +92,11 @@ O IR incide **somente sobre o rendimento (lucro)**. O programa considera 1 mês 
 | Acima de 2 anos | Mais de 720 dias | **15,0%** |
 
 $$\text{Imposto} = \text{Rendimento} \times \text{Alíquota}$$
+$$\text{Valor Líquido} = \text{Saldo Final} - \text{Imposto}$$
 
+### 3. Juros Simples vs. Juros Compostos
+$$\text{Juros Simples} = \text{Valor Inicial} \times \frac{\text{taxa}}{100} \times \text{tempo}$$
+$$\text{Diferença (Juros sobre Juros)} = \text{Rendimento Composto} - \text{Juros Simples}$$
 $$\text{Valor líquido} = \text{Saldo final} - \text{Imposto}$$
 
 </details>
@@ -92,10 +112,20 @@ $$\text{Diferença (juros sobre juros)} = \text{Rendimento composto} - \text{Jur
 
 ---
 
+## 🖥️ Exemplo Prático de Simulação
 ## 🖥️ Exemplo prático
 
 **Entradas:**
+- Valor inicial: **R$ 1.000,00**
+- Prazo: **3 meses**
+- Aporte mensal: **R$ 0,00**
+- Taxa mensal: **10,0%**
 
+**Saída no Console:**
+- **Saldo Final (Composto):** R$ 1.331,00 (Rendimento: R$ 331,00)
+- **Total Juros Simples:** R$ 1.300,00 (Ganho adicional composto: R$ 31,00)
+- **Imposto de Renda (22,5%):** R$ 74,47
+- **Valor Líquido para Resgate:** R$ 1.256,53
 | Campo | Valor |
 |-------|------:|
 | Valor inicial | R$ 1.000,00 |
@@ -116,8 +146,13 @@ $$\text{Diferença (juros sobre juros)} = \text{Rendimento composto} - \text{Jur
 
 ---
 
+## 🛠️ Tecnologias Utilizadas
 ## 🛠️ Tecnologias
 
+- **Linguagem:** Java 17+
+- **Entrada/Saída:** `java.util.Scanner` e `System.out.printf` formatado
+- **Controle de Fluxo:** `while`, `for`, `if/else`, `switch/case`
+- **Interface:** ANSI Escape Codes para cores no terminal
 - **Java 17+**
 - **Entrada e saída:** `java.util.Scanner` e `System.out.printf`
 - **Controle de fluxo:** `while`, `for`, `if/else`, `switch/case`
@@ -125,8 +160,11 @@ $$\text{Diferença (juros sobre juros)} = \text{Rendimento composto} - \text{Jur
 
 ---
 
+## 💻 Como Executar
 ## 💻 Como executar
 
+### Estrutura do Pacote
+Certifique-se de que o arquivo esteja em: `src/projetos/simulador/SimuladorFinanceiro.java`.
 **Pelo IntelliJ:** abra o projeto, abra `src/SimuladorFinanceiro.java` e clique no botão verde ▶ ao lado do `main`.
 
 **Pelo terminal**, a partir da raiz do repositório:
@@ -143,8 +181,12 @@ java -cp out projetos.simulador.SimuladorFinanceiro
 
 ---
 
+### Compilar o código a partir da raiz do projeto:
+javac src/projetos/simulador/SimuladorFinanceiro.java
 ## ⚠️ Limitações atuais
 
+### Executar a aplicação:
+java -cp src projetos.simulador.SimuladorFinanceiro
 - A taxa é informada como **mensal** e fica fixa durante todo o período
 - Não considera **IOF** (cobrado nos primeiros 30 dias) nem inflação
 - O **juros simples** é calculado só sobre o valor inicial, sem os aportes. Por isso, com aporte mensal, a "diferença" mostrada superestima o ganho do composto
@@ -152,8 +194,13 @@ java -cp out projetos.simulador.SimuladorFinanceiro
 
 ---
 
+## 🚀 Próximas Evoluções (Roadmap)
 ## 🚀 Roadmap
 
+- [ ] Isenção Fiscal (LCI/LCA): Permitir a escolha do tipo de produto (CDB tributado vs LCI/LCA isento).
+- [ ] Refatoração para Programação Orientada a Objetos (POO): Separar as responsabilidades em classes (Simulador, CalculadoraTributaria, Investimento).
+- [ ] Tratamento de Precisão Monetária: Substituir tipos primitivos double por BigDecimal para evitar imprecisões de arredondamento financeiro.
+- [ ] Testes Unitários: Implementar testes automatizados com JUnit 5.
 - [ ] **Juros simples com aportes:** corrigir o comparativo quando houver aporte mensal
 - [ ] **Isenção fiscal (LCI/LCA):** escolher entre CDB tributado e LCI/LCA isento
 - [ ] **Tratamento de entradas inválidas:** aceitar apenas números válidos
@@ -169,7 +216,10 @@ java -cp out projetos.simulador.SimuladorFinanceiro
 
 **Yasmin**
 
+Graduanda em Engenharia de Software | Trainee Fourcamp (Foursys) | Foco em Backend, Java & FinTechs
 Graduanda em Engenharia de Software | Trainee Fourcamp (Foursys) | Foco em Back-end, Java e FinTechs
 
+GitHub: [github.com/yayamin2](https://github.com/yayamin2)  
+LinkedIn: [yasminmorenomendes](https://www.linkedin.com/in/yasminmorenomendes)
 [![GitHub](https://img.shields.io/badge/GitHub-yayamin2-181717?style=flat-square&logo=github)](https://github.com/yayamin2)
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-yasminmorenomendes-0077B5?style=flat-square&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/yasminmorenomendes)
