@@ -2,6 +2,9 @@ package projetos.simulador;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.text.NumberFormat;
+import java.util.InputMismatchException;
+import java.util.Locale;
 import java.util.Scanner;
 
 // Simulador de investimento: juros compostos mês a mês, com aporte mensal, comparação com juros simples e imposto de renda
@@ -12,11 +15,21 @@ import java.util.Scanner;
 
 public class SimuladorFinanceiro {
 
+    // Cores ANSI para formatação do terminal
     public static final String RESET = "\u001B[0m";
     public static final String VERDE = "\u001B[32m";
     public static final String VERMELHO = "\u001B[31m";
     public static final String AMARELO = "\u001B[33m";
     public static final String CIANO = "\u001B[36m";
+
+    // Constantes para alíquotas de Imposto de Renda (tabela regressiva)
+    public static final BigDecimal ALIQUOTA_ATE_180_DIAS = new BigDecimal("0.225");  // 22.5%
+    public static final BigDecimal ALIQUOTA_ATE_360_DIAS = new BigDecimal("0.20");    // 20.0%
+    public static final BigDecimal ALIQUOTA_ATE_720_DIAS = new BigDecimal("0.175");  // 17.5%
+    public static final BigDecimal ALIQUOTA_ACIMA_720_DIAS = new BigDecimal("0.15"); // 15.0%
+
+    // Formatação de moeda brasileira
+    private static final NumberFormat FORMATADOR_MOEDA = NumberFormat.getCurrencyInstance(new Locale("pt", "BR"));
 
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
@@ -28,23 +41,17 @@ public class SimuladorFinanceiro {
         BigDecimal aporte = BigDecimal.ZERO;          // Aporte mensal
         int opcao = 1;                                // Opção do menu (permanece int)
 
-        System.out.print("Digite o valor que você quer investir: ");
-        // Converte o double lido do Scanner para BigDecimal
-        // valueOf é preferido pois cria BigDecimal com representação exata
-        valor = BigDecimal.valueOf(sc.nextDouble());
+        // Leitura do valor inicial com validação (não pode ser negativo)
+        valor = lerBigDecimalPositivo(sc, "Digite o valor que você quer investir: ");
 
-        System.out.print("Digite por quanto tempo (em meses) você quer deixar o dinheiro investido: ");
-        tempo = sc.nextInt();
-        while (tempo <= 0) {
-            System.out.print(VERMELHO + "Tempo inválido, digite um número maior que zero: " + RESET);
-            tempo = sc.nextInt();
-        }
+        // Leitura do tempo com validação (não pode ser zero ou negativo)
+        tempo = lerIntPositivo(sc, "Digite por quanto tempo (em meses) você quer deixar o dinheiro investido: ");
 
-        System.out.print("Qual será o valor do aporte mensal? ");
-        aporte = BigDecimal.valueOf(sc.nextDouble());
+        // Leitura do aporte mensal com validação (pode ser zero, mas não negativo)
+        aporte = lerBigDecimalNaoNegativo(sc, "Qual será o valor do aporte mensal? ");
 
-        System.out.print("Digite a taxa de juros do seu banco: ");
-        juros = BigDecimal.valueOf(sc.nextDouble());
+        // Leitura da taxa de juros com validação (não pode ser negativa)
+        juros = lerBigDecimalPositivo(sc, "Digite a taxa de juros do seu banco: ");
 
         System.out.println("\n" + CIANO + "=== EVOLUÇÃO MÊS A MÊS ===" + RESET);
         BigDecimal saldo = valor;  // Saldo inicial é igual ao valor investido
@@ -67,7 +74,7 @@ public class SimuladorFinanceiro {
             // saldo = saldo + aumento (adiciona os juros ao saldo)
             saldo = saldo.add(aumento);
             
-            System.out.printf("Mês %d: R$ %.2f%n", i, saldo);
+            System.out.printf("Mês %d: %s%n", i, formatarMoeda(saldo));
         }
         
         // .multiply(): Multiplica o aporte pelo número de meses
@@ -77,21 +84,21 @@ public class SimuladorFinanceiro {
         // .subtract(): Subtrai dois BigDecimal
         // rendimento = saldo - valorInserido
         BigDecimal rendimento = saldo.subtract(valorInserido);
-        System.out.printf(VERDE + "Total de juros ganhos: R$ %.2f%n" + RESET, rendimento);
+        System.out.printf(VERDE + "Total de juros ganhos: %s%n" + RESET, formatarMoeda(rendimento));
 
         int dias = tempo * 30;
-        BigDecimal aliquota = BigDecimal.ZERO;
+        BigDecimal aliquota;
         
         // Define a alíquota de imposto baseada no tempo de investimento
-        // Usamos strings para criar BigDecimal com representação exata
+        // Usa constantes definidas no topo da classe
         if (dias <= 180) {
-            aliquota = new BigDecimal("0.225");  // 22.5% para até 180 dias
+            aliquota = ALIQUOTA_ATE_180_DIAS;  // 22.5% para até 180 dias
         } else if (dias <= 360) {
-            aliquota = new BigDecimal("0.20");   // 20% para até 360 dias
+            aliquota = ALIQUOTA_ATE_360_DIAS;  // 20% para até 360 dias
         } else if (dias <= 720) {
-            aliquota = new BigDecimal("0.175"); // 17.5% para até 720 dias
+            aliquota = ALIQUOTA_ATE_720_DIAS;  // 17.5% para até 720 dias
         } else {
-            aliquota = new BigDecimal("0.15");   // 15% para mais de 720 dias
+            aliquota = ALIQUOTA_ACIMA_720_DIAS; // 15% para mais de 720 dias
         }
 
         // .multiply(): Calcula o imposto = rendimento * aliquota
@@ -124,17 +131,17 @@ public class SimuladorFinanceiro {
 
             switch (opcao) {
                 case 1:
-                    System.out.printf("Total investido: R$ %.2f%n", valorInserido);
-                    System.out.printf(VERDE + "Saldo final: R$ %.2f%n" + RESET, saldo);
-                    System.out.printf(VERDE + "Total de juros ganhos: R$ %.2f%n" + RESET, rendimento);
+                    System.out.printf("Total investido: %s%n", formatarMoeda(valorInserido));
+                    System.out.printf(VERDE + "Saldo final: %s%n" + RESET, formatarMoeda(saldo));
+                    System.out.printf(VERDE + "Total de juros ganhos: %s%n" + RESET, formatarMoeda(rendimento));
                     break;
                 case 2:
-                    System.out.printf("Total no juros simples: R$ %.2f%n", totalSimples);
-                    System.out.printf(AMARELO + "Diferença (juros sobre juros): R$ %.2f%n" + RESET, diferenca);
+                    System.out.printf("Total no juros simples: %s%n", formatarMoeda(totalSimples));
+                    System.out.printf(AMARELO + "Diferença (juros sobre juros): %s%n" + RESET, formatarMoeda(diferenca));
                     break;
                 case 3:
-                    System.out.printf(VERMELHO + "Imposto de Renda: R$ %.2f%n" + RESET, imposto);
-                    System.out.printf(VERDE + "Valor líquido no resgate: R$ %.2f%n" + RESET, resgate);
+                    System.out.printf(VERMELHO + "Imposto de Renda: %s%n" + RESET, formatarMoeda(imposto));
+                    System.out.printf(VERDE + "Valor líquido no resgate: %s%n" + RESET, formatarMoeda(resgate));
                     break;
                 case 0:
                     System.out.println(AMARELO + "Até logo!" + RESET);
@@ -145,6 +152,88 @@ public class SimuladorFinanceiro {
         }
 
         sc.close();
+    }
+
+    /**
+     * Lê um BigDecimal positivo do usuário com validação.
+     * Repete a pergunta até que o usuário digite um valor maior que zero.
+     *
+     * @param scanner Scanner para leitura da entrada
+     * @param mensagem Mensagem a ser exibida para o usuário
+     * @return BigDecimal positivo digitado pelo usuário
+     */
+    private static BigDecimal lerBigDecimalPositivo(Scanner scanner, String mensagem) {
+        while (true) {
+            try {
+                System.out.print(mensagem);
+                BigDecimal valor = BigDecimal.valueOf(scanner.nextDouble());
+                if (valor.compareTo(BigDecimal.ZERO) > 0) {
+                    return valor;
+                }
+                System.out.print(VERMELHO + "Valor inválido, digite um número maior que zero: " + RESET);
+            } catch (InputMismatchException e) {
+                System.out.print(VERMELHO + "Entrada inválida, digite um número válido: " + RESET);
+                scanner.next(); // Limpa o buffer do scanner
+            }
+        }
+    }
+
+    /**
+     * Lê um BigDecimal não negativo do usuário com validação.
+     * Repete a pergunta até que o usuário digite um valor maior ou igual a zero.
+     *
+     * @param scanner Scanner para leitura da entrada
+     * @param mensagem Mensagem a ser exibida para o usuário
+     * @return BigDecimal não negativo digitado pelo usuário
+     */
+    private static BigDecimal lerBigDecimalNaoNegativo(Scanner scanner, String mensagem) {
+        while (true) {
+            try {
+                System.out.print(mensagem);
+                BigDecimal valor = BigDecimal.valueOf(scanner.nextDouble());
+                if (valor.compareTo(BigDecimal.ZERO) >= 0) {
+                    return valor;
+                }
+                System.out.print(VERMELHO + "Valor inválido, digite um número maior ou igual a zero: " + RESET);
+            } catch (InputMismatchException e) {
+                System.out.print(VERMELHO + "Entrada inválida, digite um número válido: " + RESET);
+                scanner.next(); // Limpa o buffer do scanner
+            }
+        }
+    }
+
+    /**
+     * Lê um inteiro positivo do usuário com validação.
+     * Repete a pergunta até que o usuário digite um valor maior que zero.
+     *
+     * @param scanner Scanner para leitura da entrada
+     * @param mensagem Mensagem a ser exibida para o usuário
+     * @return inteiro positivo digitado pelo usuário
+     */
+    private static int lerIntPositivo(Scanner scanner, String mensagem) {
+        while (true) {
+            try {
+                System.out.print(mensagem);
+                int valor = scanner.nextInt();
+                if (valor > 0) {
+                    return valor;
+                }
+                System.out.print(VERMELHO + "Valor inválido, digite um número maior que zero: " + RESET);
+            } catch (InputMismatchException e) {
+                System.out.print(VERMELHO + "Entrada inválida, digite um número válido: " + RESET);
+                scanner.next(); // Limpa o buffer do scanner
+            }
+        }
+    }
+
+    /**
+     * Formata um BigDecimal como moeda brasileira (R$).
+     *
+     * @param valor Valor a ser formatado
+     * @return String formatada como moeda brasileira
+     */
+    private static String formatarMoeda(BigDecimal valor) {
+        return FORMATADOR_MOEDA.format(valor);
     }
 }
 
