@@ -15,7 +15,6 @@
 
 ---
 
-## 📌 Sobre o Projeto
 ## 📌 Sobre o projeto
 
 O **Simulador Financeiro** é uma aplicação de terminal em **Java** que projeta o crescimento de um investimento em **Renda Fixa** (como CDB e Tesouro Direto), mês a mês.
