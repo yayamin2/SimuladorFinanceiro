@@ -68,7 +68,7 @@ O programa calcula a curva de crescimento do dinheiro mês a mês, considerando 
 <details>
 <summary><b>1. Evolução patrimonial (juros compostos com aporte)</b></summary>
 
-A cada mês $t$, o saldo anterior recebe o aporte e, sobre o total, incide a taxa:
+A cada mês, o saldo anterior recebe o aporte e, sobre o total, incide a taxa:
 
 ### 1. Evolução Patrimonial (Juros Compostos com Aporte)
 A cada mês (t), o saldo do período anterior recebe o aporte mensal e, sobre o total, incide a taxa de juros informada: $$\text{Saldo} t = (\text{Saldo} {t-1} + \text{Aporte}) \times \left(1 + \frac{\text{taxa}}{100}\right)$$
